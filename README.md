@@ -1,6 +1,6 @@
 # notion-workspace
 
-Local markdown mirror of my Notion workspace. Pull pages down, edit locally, push changes back. Syncs only what has changed.
+Local markdown mirror of your Notion workspace. Pull pages down, edit locally, push changes back. Syncs only what has changed.
 
 ## Setup
 
