@@ -1,0 +1,3 @@
+[submodule "notionary"]
+	path = notionary
+	url = https://github.com/vibhoraggarwal/notionary
