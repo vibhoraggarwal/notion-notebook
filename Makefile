@@ -2,8 +2,8 @@
 
 # ── Setup ────────────────────────────────────────────────────────────────────
 
-install:          ## Install Python dependencies
-	pip install -r requirements.txt
+install:          ## Install Python dependencies into the active Python/venv
+	python -m pip install -r requirements.txt
 
 setup:            ## Create .env from template (skip if already exists)
 	@test -f .env && echo ".env already exists, skipping." || (cp .env.example .env && echo "Created .env — edit it before running.")
