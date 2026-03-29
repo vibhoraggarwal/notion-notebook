@@ -36,6 +36,9 @@ from notionary.page import mapper as page_mapper
 from notionary.page.schemas import PageDto
 from tqdm import tqdm
 
+sys.path.insert(0, str(Path(__file__).parent))
+from weather import apply_weather, load_weather_config
+
 REPO_ROOT = Path(__file__).parent.parent
 
 
@@ -253,6 +256,9 @@ async def push(target: str | None = None):
     # Sort so shallower paths (parents) are processed before deeper ones (children)
     files = sorted(files, key=lambda f: len(f.parts))
 
+    weather_config = load_weather_config()
+    tz = os.environ.get("WEATHER_TZ", "Europe/Berlin")
+
     created = pushed = skipped = 0
 
     async with Notionary() as notion:
@@ -260,6 +266,25 @@ async def push(target: str | None = None):
             for f in files:
                 rel = f.relative_to(PAGES_DIR)
                 bar.set_description(str(rel)[:50])
+
+                # Auto-refresh weather for all saved configs on this file
+                wc_list = weather_config.get(str(rel), [])
+                for wc in wc_list:
+                    try:
+                        await apply_weather(
+                            f,
+                            wc.get("start"),
+                            wc.get("end"),
+                            wc["lat"],
+                            wc["lon"],
+                            tz,
+                            wc.get("resolved_city"),
+                        )
+                        label = wc.get("resolved_city") or "default"
+                        tqdm.write(f"  weather: {rel} ({label})")
+                    except Exception as e:
+                        tqdm.write(f"  weather error ({rel}): {e}")
+
                 info = parse_file(f)
                 try:
                     if info["notion_id"] is None:
